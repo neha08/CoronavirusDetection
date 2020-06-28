@@ -19,11 +19,8 @@ Weak signal events cannot be detected and verified easily unlike signal events. 
 - /home/neha/.local/bin/kaggle competitions list
 - /home/neha/.local/bin/kaggle datasets download -d sudalairajkumar/novel-corona-virus-2019-dataset
 - unzip novel-corona-virus-2019-dataset.zip
-​
 
 
 [Project Presentation Video] : ​​https://youtu.be/DZcj1QFaikU
 
-
-
-[Project Demo Video]: https://youtu.be/UivQ1fZoTR4
+[Project Demo Video] : https://youtu.be/UivQ1fZoTR4
