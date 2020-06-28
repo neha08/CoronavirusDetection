@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>EventMapper framework for coronavirus detection</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+		
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+	<style>
+		
+
+  		 hr {
+  			 border: 1px solid #fff;
+  		 }
+		
+		  #map {
+	        height: 100%;
+	        margin-left:0px;
+	        margin-top:0px;
+	        float: left;
+	      }
+
+	      #form_element{
+	        margin-left:0px;
+	        margin-top: 0px;
+	      }
+
+	      html, body {
+	        height: 100%;
+	        margin: 0;
+	        padding: 0;
+	      }
+
+	      #showChart{
+	        background-color: #5bb85b;
+	        color: #ffffff;
+	        padding: 10px;
+	        border: 0px;
+	        border-radius: 8px;
+	        font-size: 14px;
+	        outline: none;
+	        cursor: pointer;
+	      }
+
+	      #floating-panel {
+	        margin-top:50px;
+	        position: absolute;
+	        top: 10px;
+	        margin-left: 600px;
+	        z-index: 5;
+	        background-color: #fff;
+	        padding: 5px;
+	        border: 1px solid #999;
+	        text-align: center;
+	        font-family: 'Roboto','sans-serif';
+	        line-height: 30px;
+	        padding-left: 10px;
+	      }
+
+         @media screen and (min-width: 1500px) {
+
+            .modal-dialog {
+
+              width: 1500px; /* New width for default modal */
+
+            }
+
+            .modal-sm {
+
+              width: 1500px; /* New width for small modal */
+
+            }
+
+        }
+
+        @media screen and (min-width: 1500px) {
+
+            .modal-lg {
+
+              width: 1500px; /* New width for large modal */
+
+            }
+
+        }
+	</style>	
+  </head>
+  <body>
+		
+		<div class="wrapper d-flex align-items-stretch">
+			<nav id="sidebar" class="active">
+				<div class="custom-menu">
+					<button type="button" id="sidebarCollapse" class="btn btn-primary">
+	          <i class="fa fa-bars"></i>
+	          <span class="sr-only">Toggle Menu</span>
+	        </button>
+        </div>
+				<div class="p-4">
+				 	<div id="form_element" style="float:left; width:100%;"> 
+				      <h5>Search by province</h5>
+				      <form method="post" action="/">
+				          <input type="text" id="province" name="province" size="13" placeholder="Enter the province name .."><br><br>
+				          <input type="submit" value="Submit">
+				      </form> <br/>
+				      <h5>Country wise Analysis</h5>
+              <div class="container">
+              <!-- Trigger the modal with a button -->
+              <button type="button" id="modalBtn" class="btn btn-info btn-lg" data-toggle="modal" data-target="#chartModal">Open Modal</button>
+              <!-- Modal -->
+              <div class="modal fade" id="chartModal" role="dialog">
+                <div class="modal-dialog modal-lg" style="width:1500px;">   
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header text-center">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h3 class="modal-title w-100 text-center">Global Statistics</h3>
+                    </div>
+                    <div class="modal-body">
+                       <div id="chartContainer1" style="height: 420px; width: 47%; display: inline-block;"></div> 
+                        <div id="chartContainer2" style="height: 420px; width: 49%; display: inline-block;"></div> <br/>
+                        <div id="chartContainer3" style="height: 420px; width: 47%; display: inline-block;"></div>
+                        <div id="chartContainer4" style="height: 420px; width: 49%; display: inline-block;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+             </div>
+            </div>
+    	</nav>
+
+        <!-- Page Content  -->
+      <div id="content" class="p-1 p-md-5 pt-3">
+			 <div id="floating-panel">
+          <button type="button" id="clearMarkers" class="btn btn-success">Clear Markers</button>
+          <button type="button" id="showMarkers" class="btn btn-success">Show Markers</button>
+          <button type="button" id="deleteMarkers" class="btn btn-success">Delete Markers</button>
+		    </div>
+		    <div id="map" style="float:left; width:100%;"></div>
+	  </div>
+	</div>
+
+   <script>
+
+      var chart = new CanvasJS.Chart("chartContainer1", 
+      {
+        animationEnabled: true,
+        title: {
+          text: "USA"
+        },
+        axisY: {
+          title: "Number of confirmed cases",
+          suffix: "",
+          includeZero: false
+        },
+        axisX: {
+          title: "Date"
+        },
+        height: 400,
+        width: 320,
+        data: [{
+          type: "line",
+          yValueFormatString: "#,##00#"%"",
+          dataPoints: [
+            { label: "1/31/20", y: 1009 },  
+            { label: "2/15/20", y: 940 },
+            { label: "2/29/20", y: 850 },
+            { label: "3/1/20", y: 796 }, 
+            { label: "3/10/20", y: 780 },
+          ]
+        }]
+      }); 
+    chart.render();
+
+    var chart = new CanvasJS.Chart("chartContainer2",
+    {
+        animationEnabled: true,
+        title: {
+          text: "China"
+        },
+        axisY: {
+          title: "Number of confirmed cases",
+          suffix: "",
+          includeZero: false
+        },
+        axisX: {
+          title: "Date"
+        },
+        height: 400,
+        width: 340,
+        data: [{
+          type: "line",
+          yValueFormatString: "#,##00#"%"",
+          dataPoints: [
+            { label: "1/31/20", y: 1009 },  
+            { label: "2/15/20", y: 940 },
+            { label: "2/29/20", y: 850 },
+            { label: "3/1/20", y: 796 }, 
+            { label: "3/10/20", y: 780 }
+          ]
+        }]
+    });
+
+    chart.render();
+      
+    var chart = new CanvasJS.Chart("chartContainer3",
+    {
+        animationEnabled: true,
+        title: {
+          text: "Hong Kong"
+        },
+        axisY: {
+          title: "Number of confirmed cases",
+          suffix: "",
+          includeZero: false
+        },
+        axisX: {
+          title: "Date"
+        },
+        height: 400,
+        width: 320,
+        data: [{
+          type: "line",
+          yValueFormatString: "#,##00#"%"",
+          dataPoints: [
+            { label: "1/31/20", y: 1009 },  
+            { label: "2/15/20", y: 940 },
+            { label: "2/29/20", y: 850 },
+            { label: "3/1/20", y: 796 }, 
+            { label: "3/10/20", y: 780 }
+          ]
+        }]
+      });
+  
+  chart.render();
+
+      var chart = new CanvasJS.Chart("chartContainer4",
+      {
+        animationEnabled: true,
+        title: {
+          text: "Canada"
+        },
+        axisY: {
+          title: "Number of confirmed cases",
+          suffix: "",
+          includeZero: false
+        },
+        axisX: {
+          title: "Date"
+        },
+        height: 400,
+        width: 340,
+        data: [{
+          type: "line",
+          yValueFormatString: "#,##00#"%"",
+          dataPoints: [
+            { label: "1/31/20", y: 1009 },  
+            { label: "2/15/20", y: 940 },
+            { label: "2/29/20", y: 850 },
+            { label: "3/1/20", y: 796 }, 
+            { label: "3/10/20", y: 780 }
+          ]
+        }]
+      });
+
+  chart.render();
+</script>
+	<script>
+
+      var map;
+      var markers=[];
+
+      // Sets the map on all markers in the array.
+      function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+        }
+      }
+
+      // Removes the markers from the map, but keeps them in the array.
+      function clearMarkers() {
+        setMapOnAll(null);
+      }
+
+      // Shows any markers currently in the array.
+      function showMarkers() {
+        setMapOnAll(map);
+      }
+
+      // Deletes all markers in the array by removing references to them.
+      function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+      }
+
+      var btn = document.getElementById("clearMarkers");
+      btn.addEventListener("click", clearMarkers);
+
+      var btn2 = document.getElementById("showMarkers");
+      btn2.addEventListener("click", showMarkers);
+
+      var btn3 = document.getElementById("deleteMarkers");
+      btn3.addEventListener("click", deleteMarkers);
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: {lat: 31.51073, lng: -96.4247},
+          gestureHandling: 'cooperative' 
+        });
+
+        var resultsVar = '{{ results }}';
+        var Lats = '{{ Lats }}';
+        Lats = Lats.split(',');
+        var Longs = '{{ Longs }}';
+        Longs = Longs.split(',');
+        var Deaths = '{{ Deaths }}';
+        Deaths = Deaths.split(',');
+        var Confirmed = '{{ Confirmed }}';
+        Confirmed = Confirmed.split(',');
+        var Recovered = '{{ Recovered }}';
+        Recovered = Recovered.split(',');
+        var provincenames = '{{ provincenames }}';
+        provincenames = provincenames.split(',');
+        
+        var resultsVar = '{{ results }}';
+        var temp = resultsVar.split(',');
+        var provincename = '{{ provincename }}';
+        var Lat = parseInt(temp[3], 10);
+        var Long = parseInt(temp[4], 10);
+        var n=temp.length;
+        var DeathCount = temp[n-2];
+        DeathCount = DeathCount.substring(0, DeathCount.length - 2);
+        var RecoveredCount = temp[n-2];
+        RecoveredCount = RecoveredCount.substring(0, RecoveredCount.length - 2);  
+        var ConfirmedCount = temp[n-2];
+        ConfirmedCount = ConfirmedCount.substring(0, ConfirmedCount.length - 2);  
+
+        for (var i = 0; i < Lats.length; i++) {
+          var Lat;
+          var Long;
+          if (i==0){
+            Lat = Lats[i].substring(1, Lats[i].length-1);
+            Long = Longs[i].substring(1, Longs[i].length-1);
+            provincenames[i] = provincenames[i].substring(1, provincenames[i].length-1);
+            Deaths[i] = Deaths[i].substring(1, Deaths[i].length);
+            Recovered[i] = Recovered[i].substring(1, Recovered[i].length);
+            Confirmed[i] = Confirmed[i].substring(1, Confirmed[i].length);
+          }
+          else{
+            Lat = Lats[i];
+            Long = Longs[i];
+            provincenames[i] = provincenames[i].substring(1, provincenames[i].length-2);
+            Deaths[i] = Deaths[i].substring(1, Deaths[i].length);
+            Recovered[i] = Recovered[i].substring(1, Recovered[i].length);
+            Confirmed[i] = Confirmed[i].substring(1, Confirmed[i].length);
+          }
+
+          if(i==Lats.length-1){
+            Deaths[i] = Deaths[i].substring(0, Deaths[i].length-1);
+            Recovered[i] = Recovered[i].substring(0, Recovered[i].length-1);
+            Confirmed[i] = Confirmed[i].substring(0, Confirmed[i].length-1);
+          }
+
+          if(i!=0 && i!=Lats.length-1){ 
+            provincenames[i] = provincenames[i].substring(0, provincenames[i].length-2);
+          }
+
+          Lat = parseInt(Lat, 10);
+          Long = parseInt(Long, 10);
+          provincenames[i] = provincenames[i].substring(6, provincenames[i].length-1);
+          provincenames[i].replace('&', '');
+          provincenames[i].replace('#', '');
+        
+          var marker = new google.maps.Marker({
+            position: {lat: Lat, lng: Long},
+            title: provincenames[i]
+          });
+
+          markers.push(marker);
+          marker.setMap(map);
+          Deaths[i] = parseInt(Deaths[i], 10);
+          Confirmed[i] = parseInt(Confirmed[i], 10);
+          Recovered[i] = parseInt(Recovered[i], 10);
+      
+          var contentString2 = '<div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">'+ provincenames[i] +'</h1><div id="bodyContent"> <p> Latitude: '+ Lat +'</p> <p> Longitude:'+ Long +'</p> </p> <p> ConfirmedCount: '+ Confirmed[i] + '</p><p> DeathCount: '+ Deaths[i] + ' </p><p> RecoveredCount: '+ Recovered[i] + '</div>';
+
+          var infowindow = new google.maps.InfoWindow({
+            content: contentString2,
+            maxHeight: 50
+          });
+
+          google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
+              return function() {
+                  infowindow.setContent(content);
+                  infowindow.open(map,marker);
+              };
+          })(marker,content,infowindow));  
+        }
+      }
+
+      // Get the modal
+      var modal = document.getElementById("myModal");
+      // Get the button that opens the modal
+      var btn4 = document.getElementById("myBtn");
+      // Get the <span> element that closes the modal
+      var span = document.getElementsByClassName("close")[0];
+      // When the user clicks the button, open the modal 
+      btn4.onclick = function() {
+        modal.style.display = "block";
+      }
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function() {
+        modal.style.display = "none";
+      }
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0kaQLZbzij51--QyAEy-urRmCof0jDt0&callback=initMap">
+    </script>
+ 
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+  <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+  <script src="{{url_for('static', filename='js/popper.js')}}"></script>
+  <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+  <script src="{{url_for('static', filename='js/main.js')}}"></script> 
+  
+  </body>
+</html>
+
